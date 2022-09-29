@@ -1,3 +1,6 @@
+## Generated PDFs which should *not* be checked in
+types.pdf
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
