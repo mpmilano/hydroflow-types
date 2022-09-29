@@ -23,8 +23,8 @@
     \compiledcomponent &:= \incast;\outcast\\
     \incast &= \seqstart; \chain ∣ "rejoin"(\incast ∣ \incast ); \chain\\
     \outcast &= \chain; \seqend ∣ \chain; "tee"(\outcast ∣ \outcast)\\
-    \seqstart &= A ∣ \op[\N]\\
-    \seqend &= A ∣ [\N]\op
+    \seqstart &= A ∣ \op[ℕ]\\
+    \seqend &= A ∣ [ℕ]\op
   \end{align*}
   \label{fig:syntax}
   \caption{Syntax}
