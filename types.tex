@@ -1,16 +1,30 @@
 
 \documentclass{article}
-\usepackage{utf8math,ttquot,mathpartir,amsmath, amssymb, hydrocomments, mathtools,multicol}
+\usepackage{utf8math,ttquot,mathpartir,amsmath, amssymb, hydrocomments, mathtools,multicol,xspace}
 \usepackage[margin=1in]{geometry}
 \begin{document}
 
 \section{syntax}
 
+\newcommand{\closedprogram}{\textit{closed-program}\xspace}
+\newcommand{\compiledcomponent}{\textit{compiled-component}\xspace}
+\newcommand{\incast}{\textit{incast}\xspace}
+\newcommand{\outcast}{\textit{outcast}\xspace}
+\newcommand{\seqstart}{\textit{seq-start}\xspace}
+\newcommand{\seqend}{\textit{seq-end}\xspace}
+\newcommand{\chain}{\textit{chain}\xspace}
+\newcommand{\op}{\textit{op}\xspace}
+\newcommand{\N}{\mathbb{N}}
+
 \begin{figure}
   \begin{align*}
-    \textit{closed-program} &:= "declare"~ A… ~"in"~ \textit{compiled-component}…\\
+    \closedprogram &:= "declare"~ A… ~"in"~ \compiledcomponent…\\
     A &∈ \textit{handoff-names}\\
-    compiled-component &:= \textit{incast};\textit{outcast}
+    \compiledcomponent &:= \incast;\outcast\\
+    \incast &= \seqstart; \chain ∣ "rejoin"(\incast ∣ \incast ); \chain\\
+    \outcast &= \chain; \seqend ∣ \chain; "tee"(\outcast ∣ \outcast)\\
+    \seqstart &= A ∣ \op[\N]\\
+    \seqend &= A ∣ [\N]\op
   \end{align*}
   \label{fig:syntax}
   \caption{Syntax}
