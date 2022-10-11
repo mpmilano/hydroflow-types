@@ -17,14 +17,14 @@
 \newcommand{\opt}{τ_{\textit{op}}\xspace}
 \newcommand{\N}{ℕ}
 \newcommand{\fresh}{\textit{fresh}\xspace}
+\newcommand{\inputs}{\textit{inputs}\xspace}
+\newcommand{\outputs}{\textit{outputs}\xspace}
 
 \begin{figure}
   \begin{align*}
-    \closedprogram &:= "declare"~ A…~"in"~ \compiledcomponent…\\
+    \closedprogram &:= "declare"~ A…~"in"~ p\\
     A &∈ \textit{handoff-names}\\
-    \compiledcomponent &:= \incast;\outcast ∣ [\incast ∣ …]\op[\outcast ∣ …] \\
-    \incast &= A; \chain ∣ [\incast ∣ …]\op;\chain\\
-    \outcast &= \chain; A ∣ \chain; \op[\outcast ∣ …]\\
+    p &:= [p]\op[p] ∣ A ∣ (p|p)
   \end{align*}
   \label{fig:syntax}
   \caption{Syntax}
@@ -36,26 +36,38 @@ In figure \ref{fig:syntax}
 \section{types}
 
 \begin{figure}
-    \begin{mathpar}
-      \inferrule{C,A : d ⊢ "declare"~\textit{rest}…~"in"~\compiledcomponent}{C ⊢ "declare"~A, \textit{rest}…~"in"~\compiledcomponent}
-      
-      \inferrule{C ⊢ \incast \\ C ⊢ \outcast}{C ⊢ "declare"~"in"~\incast;\outcast}
+  \begin{mathpar}
 
-      \inferrule{C ⊢ [\incast ∣ …]\op_{α} \\ C ⊢ \op_{α}[\outcast ∣ …] \\ α~\fresh \\\text{something for operator}}{C ⊢ "declare"~"in"~[\incast…]\op[\outcast…]}
+    {\inferrule{A : in(dₐ : τₐ), A : out(dₐ | τₐ),… ;. : ⊤ ⊢ p : τ}{⊢ "declare"~A…~"in"~p : τ}}
+    
+    {
+      \inferrule{\inputs(\op) = τ' \\ \outputs(\op) = τ_o \\
+        C;. : ⊤ ⊢ p : τ' \\ C;d.p.\op[0] :^r τ_o ⊢ p' : τ_o'}
+                {{C,C'};{d : τ} ⊢ [p]\op[p'] : τ_o'}}
+    
+    {\inferrule[relevant-parallel]{C₁;d[n] : τ ⊢ p₁ : τ₁ \\ C₂;d[n+1] :^r τ ⊢ p₂ : τ₂}{C₁,C₂;d[n] :^r τ ⊢ (p₁ ∣ p₂) : (τ₁ ∣ τ₂)}}
+
+    {\inferrule[substructural-fallback]{C;d : τ' ⊢ p : τ}{C;d : τ' ⊢^r p : τ}}
+
+    {\inferrule[general-parallel]{C₁;. : ⊤ ⊢ p₁ : τ₁ \\ C₂;. : ⊤ ⊢ p₂ : τ₂}{C₁,C₂; . : ⊤ ⊢ (p₁ ∣ p₂) : (τ₁ ∣ τ₂)}}
+
+    {\inferrule[exchange]{A : (dₐ : τₐ),  B : (d_b | τ_b) ; d : τ ⊢ p : τ}{B : (d_b | τ_b), A : (dₐ : τₐ) ⊢ p : τ}}
+      
+    {\inferrule[unfold]{A:d',C;d[A/d] : τ ⊢ p}{A:d',C;d : τ ⊢ p}}
+
+    {\inferrule[fold]{A:d',C;d : τ ⊢ p}{A:d',C;d[A/d] : τ ⊢ p}}
+
+    {\inferrule[varref-out]{}{A:out(d : τ);d : τ ⊢ A : τ}}
+
+    {\inferrule[varref-in]{}{A:in(d : τ);. : \_ ⊢ A : τ}}
       
     \end{mathpar}
-    \includegraphics{freehand-types}
+    %\includegraphics{freehand-types}
   \label{fig:types}
   \caption{Types}
 \end{figure}
 
-I feel like we need to put operators in the environment if we want to
-be able to do the incast-outcast split. In fact, I feel like we might
-have a derivation problem _in general_ when doing the incast-outcast
-split. Annoying!
-
-
-In figure \ref{fig:types}
+We're not bothering with the oaklandish split right now, it's too silly.  Open question if we need the relevance version of the rule, or can remove the $:^r$ annotation and observe that the $[n]$ version is only ever used with empty contexts for inputs to operators. Also worth wondering if we're going to be in trouble overloading the [] syntax here; time will tell. Types appear in figure \ref{fig:types}
 
 
 \end{document}
