@@ -104,5 +104,9 @@ only ever used with empty contexts for inputs to operators. Also worth
 wondering if we're going to be in trouble overloading the [] syntax
 here; time will tell. Types appear in figure \ref{fig:types}
 
+\section{general notes}
+
+Something we originally wanted to do was relaxations---operators that happened to consume input $'s$, but could just as well accept any $"permute"('s)$.  How do we want to model this relaxation now, and is it still in scope? Concretely, I believe that this _is_ still in scope, and takes the form of setting translation-preservation targets to literal expressions like $"permute"('s)$.  The challenge here will be reasoning in the algebra; we're not talking about equational rewriting anymore, since we also need to include weakening ("permute" generalizes lots of transformations). 
+
 
 \end{document}
