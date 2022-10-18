@@ -40,12 +40,15 @@
 \newcommand{\fresh}{\textit{fresh}\xspace}
 \newcommand{\inputs}{\textit{inputs}\xspace}
 \newcommand{\outputs}{\textit{outputs}\xspace}
+\newcommand{\IT}[1]{{\textit{#1}}\xspace}
 
 \begin{figure}
   \begin{align*}
     \closedprogram &:= "declare"~ A…~"in"~ p\\
     A &∈ \textit{handoff-names}\\
-    p &:= [p]\op[p] ∣ A ∣ (p|p)
+    p_\IT{out} &:= [p_\IT{out}]\op ∣ A ∣ (p_\IT{out}|p_\IT{out})\\
+    p_\IT{in} &:= [p_\IT{in}]\op ∣ A ∣ (p_\IT{in}|p_\IT{in})\\
+    p &:= [p_\IT{in}]\op[p_\IT{out}] ∣ (p|p)
   \end{align*}
   \label{fig:syntax}
   \caption{Syntax}
@@ -59,35 +62,48 @@ In figure \ref{fig:syntax}
 \begin{figure}
   \begin{mathpar}
 
-    {\inferrule{A : in(dₐ : τₐ), A : out(dₐ | τₐ),… ;. : ⊤ ⊢ p : τ}
+    {\inferrule{A : in(dₐ), A : out(dₐ),… ;A : τₐ,…;.  ⊢ p : τ}
       {⊢ "declare"~A…~"in"~p : τ}}
     
     {
-      \inferrule{\inputs(\op) = τ' \\ \outputs(\op) = τ_o \\
-        C;. : ⊤ ⊢ p : τ' \\ C';d.p.\op[0] : τ_o ⊢ p' : τ_o'}
-                {{C,C'};{d : τ} ⊢ [p]\op[p'] : τ_o'}}
+      \inferrule{\inputs(\op) = τ \\ 
+        C;Γ;. ⊢ p : τ \\ C';Γ';d.p.\op[0] ⊢ p' : τ'}
+                {{C,C'};Γ,Γ';{d} ⊢ [p]\op[p'] : τ'}}
     
     {\inferrule[relevant-parallel]
-      {C₁;d[n] : τ ⊢ p₁ : τ₁ \\ C₂;d[n+1] : τ ⊢ p₂ : τ₂}
-      {C₁,C₂;d[n] : τ ⊢ (p₁ ∣ p₂) : (τ₁ ∣ τ₂)}}
+      {C₁;Γ_1;d[n] ⊢ p₁ : τ₁ \\ C₂;Γ_2;d[n+1] ⊢ p₂ : τ₂}
+      {C₁,C₂;Γ_1,Γ_2;d[n] ⊢ (p₁ ∣ p₂) : (τ₁ ∣ τ₂)}}
 
     {\inferrule[general-parallel]
-      {C₁;. : ⊤ ⊢ p₁ : τ₁ \\ C₂;. : ⊤ ⊢ p₂ : τ₂}
-      {C₁,C₂; . : ⊤ ⊢ (p₁ ∣ p₂) : (τ₁ ∣ τ₂)}}
+      {C₁;Γ_1;. ⊢ p₁ : τ₁ \\ C₂;Γ_2;. ⊢ p₂ : τ₂}
+      {C₁,C₂;Γ_1,Γ_2; . ⊢ (p₁ ∣ p₂) : (τ₁ ∣ τ₂)}}
 
-    {\inferrule[exchange]
-      {A : (dₐ : τₐ),  B : (d_b | τ_b) ; d : τ ⊢ p : τ}
-      {B : (d_b | τ_b), A : (dₐ : τₐ) ⊢ p : τ}}
+    {\inferrule[exchange-C]
+      {C,C_2,C_1,C' ;Γ; d ⊢ p : τ}
+      {C,C_1,C_2,C' ;Γ; d ⊢ p : τ}}
+
+    {\inferrule[exchange-gamma]
+      {C ;Γ,Γ_1,Γ_2,Γ' ; d ⊢ p : τ}
+      {C ;Γ,Γ_2,Γ_1,Γ'; d ⊢ p : τ}}
+
+    {\inferrule[weaken-gamma]
+      {C ;Γ,Γ' ; d ⊢ p : τ}
+      {C ;Γ,Γ_w,Γ'; d ⊢ p : τ}}
+
+    {\inferrule[contract-gamma]
+      {C ;Γ,Γ_c,Γ_c,Γ' ; d ⊢ p : τ}
+      {C ;Γ,Γ_c,Γ'; d ⊢ p : τ}}
+
+
+    {\inferrule[unfold]{A:d',C;Γ;d[A/d] ⊢ p : τ}{A:d',C;Γ;d ⊢ p : τ}}
+
+    {\inferrule[fold]{A:d',C;Γ;d⊢ p : τ}{A:d',C;Γ;d[A/d]⊢ p : τ}}
+
+    {\inferrule[varref-out]{Γ ⊢ d : τ}{A:out(d);Γ;d ⊢ A : τ}}
+
+    {\inferrule[varref-in]{}{A:in(d);A : τ; . ⊢ A : τ}}
       
-    {\inferrule[unfold]{A:d',C;d[A/d] : τ ⊢ p}{A:d',C;d : τ ⊢ p}}
-
-    {\inferrule[fold]{A:d',C;d : τ ⊢ p}{A:d',C;d[A/d] : τ ⊢ p}}
-
-    {\inferrule[varref-out]{}{A:out(d : τ);d : τ ⊢ A : τ}}
-
-    {\inferrule[varref-in]{}{A:in(d : τ);. : \_ ⊢ A : τ}}
-      
-    \end{mathpar}
+    \end{mathpar}\MPM{There's something fishy going on with varref-in; right now, you could use it and then immediately apply unfold to get a derivation which might not typecheck. We need to prove this is not actually a problem.}
     %\includegraphics{freehand-types}
   \label{fig:types}
   \caption{Types}
