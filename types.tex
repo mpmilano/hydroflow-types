@@ -64,16 +64,12 @@ In figure \ref{fig:syntax}
     
     {
       \inferrule{\inputs(\op) = τ' \\ \outputs(\op) = τ_o \\
-        C;. : ⊤ ⊢ p : τ' \\ C;d.p.\op[0] :^r τ_o ⊢ p' : τ_o'}
+        C;. : ⊤ ⊢ p : τ' \\ C';d.p.\op[0] : τ_o ⊢ p' : τ_o'}
                 {{C,C'};{d : τ} ⊢ [p]\op[p'] : τ_o'}}
     
     {\inferrule[relevant-parallel]
-      {C₁;d[n] : τ ⊢ p₁ : τ₁ \\ C₂;d[n+1] :^r τ ⊢ p₂ : τ₂}
-      {C₁,C₂;d[n] :^r τ ⊢ (p₁ ∣ p₂) : (τ₁ ∣ τ₂)}}
-
-    {\inferrule[substructural-fallback]
-      {C;d : τ' ⊢ p : τ}
-      {C;d : τ' ⊢^r p : τ}}
+      {C₁;d[n] : τ ⊢ p₁ : τ₁ \\ C₂;d[n+1] : τ ⊢ p₂ : τ₂}
+      {C₁,C₂;d[n] : τ ⊢ (p₁ ∣ p₂) : (τ₁ ∣ τ₂)}}
 
     {\inferrule[general-parallel]
       {C₁;. : ⊤ ⊢ p₁ : τ₁ \\ C₂;. : ⊤ ⊢ p₂ : τ₂}
