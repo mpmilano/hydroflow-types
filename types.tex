@@ -102,19 +102,40 @@ In figure \ref{fig:syntax}
     {\inferrule[varref-out]{Γ ⊢ d : τ}{A:out(d);Γ;d ⊢ A : τ}}
 
     {\inferrule[varref-in]{}{A:in(d);A : τ; . ⊢ A : τ}}
+
+    {\inferrule[axoim-transform]{Γ ⊢ d ⇝ d' \\ C;Γ;d' ⊢ p : τ}{C;Γ;d ⊢ p : τ}}
+
       
     \end{mathpar}\MPM{There's something fishy going on with varref-in; right now, you could use it and then immediately apply unfold to get a derivation which might not typecheck. We need to prove this is not actually a problem.}
     %\includegraphics{freehand-types}
   \label{fig:types}
-  \caption{Types}
+  \caption{Types: top-level}
+\end{figure}
+\begin{figure}
+\begin{mathpar}
+
+    {\inferrule[derivation-type-base]{}{Γ ⊢ d : τ}}
+
+\end{mathpar}    
+    \caption{Types: derivations }
+    \label{fig:types2}
+\end{figure}
+\begin{figure}
+\begin{mathpar}
+
+{\inferrule[axoim-transform-base]{}{Γ ⊢ d ⇝ d'}}
+
+\end{mathpar}    
+    \caption{Types: axiom transformations }
+    \label{fig:types3}
 \end{figure}
 
-We're not bothering with the oaklandish split right now, it's too
-silly.  Open question if we need the relevance version of the rule, or
-can remove the $:^r$ annotation and observe that the $[n]$ version is
-only ever used with empty contexts for inputs to operators. Also worth
-wondering if we're going to be in trouble overloading the [] syntax
-here; time will tell. Types appear in figure \ref{fig:types}
+
+Worth wondering if we're going to be in trouble overloading the $[]$ syntax here; time will tell. 
+Types appear in figure \ref{fig:types}. 
+Another concern is that we have a uhhh _lot_ of type systems in the mix at this point: 
+we've got $C;Γ;d ⊢ p : τ$, $Γ ⊢ d : τ$, and $Γ ⊢ d ⇝ d'$.  
+That's a lot more independent systems than we'd ideally  have.  Is there a way to collapse this back down? 
 
 \section{general notes}
 
