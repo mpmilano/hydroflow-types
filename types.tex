@@ -137,6 +137,8 @@ Another concern is that we have a uhhh _lot_ of type systems in the mix at this 
 we've got $C;Γ;d ⊢ p : τ$, $Γ ⊢ d : τ$, and $Γ ⊢ d ⇝ d'$.  
 That's a lot more independent systems than we'd ideally  have.  Is there a way to collapse this back down? 
 
+Another important note! I think fold/unfold are wrong and unfit for purpose, actually.  We should really be replacing the variable names with their derivation expression when they're placed into the derivation context for the first time.  But as of right now, that's not how the type system works.  Maybe we need to "output" a derivation, rather than put it in the context.  Note: doing this naively immediately breaks on the dispatch to relevant-parallel and general-parallel.  I think it still holds significant promise, but might not be viable for 11:40pm.
+
 \section{general notes}
 
 Something we originally wanted to do was relaxations---operators that happened to consume input $'s$, but could just as well accept any $"permute"('s)$.  How do we want to model this relaxation now, and is it still in scope? Concretely, I believe that this _is_ still in scope, and takes the form of setting translation-preservation targets to literal expressions like $"permute"('s)$.  The challenge here will be reasoning in the algebra; we're not talking about equational rewriting anymore, since we also need to include weakening ("permute" generalizes lots of transformations). 
