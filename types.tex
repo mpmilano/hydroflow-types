@@ -62,48 +62,45 @@ In figure \ref{fig:syntax}
 \begin{figure}
   \begin{mathpar}
 
-    {\inferrule{A : in(dₐ), A : out(dₐ),… ;A : τₐ,…;.  ⊢ p : τ}
-      {⊢ "declare"~A…~"in"~p : τ}}
+    {\inferrule{A : in(dₐ), A : out(dₐ),… ;A : τₐ,…  ⊢ p}
+      {⊢ "declare"~A…~"in"~p}}
     
     {
-      \inferrule{\inputs(\op) = τ \\ 
-        C;Γ;. ⊢ p : τ \\ C';Γ';d.p.\op[0] ⊢ p' : τ'}
-                {{C,C'};Γ,Γ';{d} ⊢ [p]\op[p'] : τ'}}
+      \inferrule[pivot]{\inputs(\op) = τ \\ 
+        C;Γ ⊢ p : d~τ \\ C';Γ';d.op[0] ⊢ p'}
+                {{C,C'};Γ,Γ' ⊢ [p]\op[p']}}
+
+    {
+      \inferrule[inward]{\inputs(\op) = τ \\ 
+        C;Γ ⊢ p : d~τ}
+                {{C};Γ,Γ' ⊢ [p]\op : d.\op~τ'}}
+
+{
+      \inferrule[outward]{Γ ⊢ d : τ \\ \inputs(\op) = τ \\
+        C;Γ;d.\op[0] ⊢ p'}
+                {{C};Γ;d ⊢ \op[p']}}
+
     
-    {\inferrule[relevant-parallel]
-      {C₁;Γ_1;d[n] ⊢ p₁ : τ₁ \\ C₂;Γ_2;d[n+1] ⊢ p₂ : τ₂}
-      {C₁,C₂;Γ_1,Γ_2;d[n] ⊢ (p₁ ∣ p₂) : (τ₁ ∣ τ₂)}}
+    {\inferrule[out-parallel]
+      {C₁;Γ_1;d[n] ⊢ p₁ \\ C₂;Γ_2;d[n+1] ⊢ p₂}
+      {C₁,C₂;Γ_1,Γ_2;d[n] ⊢ (p₁ ∣ p₂)}}
 
-    {\inferrule[general-parallel]
-      {C₁;Γ_1;. ⊢ p₁ : τ₁ \\ C₂;Γ_2;. ⊢ p₂ : τ₂}
-      {C₁,C₂;Γ_1,Γ_2; . ⊢ (p₁ ∣ p₂) : (τ₁ ∣ τ₂)}}
-
-    {\inferrule[exchange-C]
-      {C,C_2,C_1,C' ;Γ; d ⊢ p : τ}
-      {C,C_1,C_2,C' ;Γ; d ⊢ p : τ}}
-
-    {\inferrule[exchange-gamma]
-      {C ;Γ,Γ_1,Γ_2,Γ' ; d ⊢ p : τ}
-      {C ;Γ,Γ_2,Γ_1,Γ'; d ⊢ p : τ}}
-
-    {\inferrule[weaken-gamma]
-      {C ;Γ,Γ' ; d ⊢ p : τ}
-      {C ;Γ,Γ_w,Γ'; d ⊢ p : τ}}
-
-    {\inferrule[contract-gamma]
-      {C ;Γ,Γ_c,Γ_c,Γ' ; d ⊢ p : τ}
-      {C ;Γ,Γ_c,Γ'; d ⊢ p : τ}}
+    {\inferrule[in-parallel]
+      {C₁;Γ_1 ⊢ p₁ : d₁~τ₁ \\ C₂;Γ_2 ⊢ p₂ : d₂~τ₂}
+      {C₁,C₂;Γ_1,Γ_2 ⊢ (p₁ ∣ p₂) : (d₁ ∣ d₂)~(τ₁ ∣ τ₂)}}
 
 
-    {\inferrule[unfold]{A:d',C;Γ;d[A/d] ⊢ p : τ}{A:d',C;Γ;d ⊢ p : τ}}
+%    {\inferrule[unfold]{A:d',C;Γ;d[A/d] ⊢ p : τ}{A:d',C;Γ;d ⊢ p : τ}}
 
-    {\inferrule[fold]{A:d',C;Γ;d⊢ p : τ}{A:d',C;Γ;d[A/d]⊢ p : τ}}
+%    {\inferrule[fold]{A:d',C;Γ;d⊢ p : τ}{A:d',C;Γ;d[A/d]⊢ p : τ}}
 
-    {\inferrule[varref-out]{Γ ⊢ d : τ}{A:out(d);Γ;d ⊢ A : τ}}
+    {\inferrule[varref-out]{Γ ⊢ d : τ}{A:out(d);Γ;d ⊢ A}}
 
-    {\inferrule[varref-in]{}{A:in(d);A : τ; . ⊢ A : τ}}
+    {\inferrule[varref-in]{}{A:in(d);A : τ ⊢ A : d~τ}}
 
-    {\inferrule[axoim-transform]{Γ ⊢ d ⇝ d' \\ C;Γ;d' ⊢ p : τ}{C;Γ;d ⊢ p : τ}}
+    {\inferrule[axoim-transform-in]{Γ ⊢ d ⇝ d' \\ C;Γ ⊢ p : d~τ}{C;Γ ⊢ p : d'~τ}}
+
+    {\inferrule[axoim-transform-out]{Γ ⊢ d ⇝ d' \\ C;Γ;d' ⊢ p}{C;Γ;d ⊢ p}}
 
       
     \end{mathpar}\MPM{There's something fishy going on with varref-in; right now, you could use it and then immediately apply unfold to get a derivation which might not typecheck. We need to prove this is not actually a problem.}
@@ -120,6 +117,7 @@ In figure \ref{fig:syntax}
     \caption{Types: derivations }
     \label{fig:types2}
 \end{figure}
+
 \begin{figure}
 \begin{mathpar}
 
@@ -130,6 +128,47 @@ In figure \ref{fig:syntax}
     \label{fig:types3}
 \end{figure}
 
+\begin{figure}
+\begin{mathpar}
+
+    {\inferrule[exchange-C-in]
+      {C,C_2,C_1,C' ;Γ ⊢ p : d~τ}
+      {C,C_1,C_2,C' ;Γ ⊢ p : d~τ}}
+
+    {\inferrule[exchange-gamma-in]
+      {C ;Γ,Γ_1,Γ_2,Γ' ⊢ p : d~τ}
+      {C ;Γ,Γ_2,Γ_1,Γ' ⊢ p : d~τ}}
+
+    {\inferrule[weaken-gamma-in]
+      {C ;Γ,Γ'  ⊢ p : d~τ}
+      {C ;Γ,Γ_w,Γ' ⊢ p : d~τ}}
+
+    {\inferrule[contract-gamma-in]
+      {C ;Γ,Γ_c,Γ_c,Γ' ⊢ p : d~τ}
+      {C ;Γ,Γ_c,Γ' ⊢ p : d~τ}}
+
+    {\inferrule[exchange-C-out]
+      {C,C_2,C_1,C' ;Γ; d ⊢ p}
+      {C,C_1,C_2,C' ;Γ; d ⊢ p}}
+
+    {\inferrule[exchange-gamma-out]
+      {C ;Γ,Γ_1,Γ_2,Γ'; d ⊢ p}
+      {C ;Γ,Γ_2,Γ_1,Γ'; d ⊢ p}}
+
+    {\inferrule[weaken-gamma-out]
+      {C ;Γ,Γ'; d  ⊢ p}
+      {C ;Γ,Γ_w,Γ'; d ⊢ p}}
+
+    {\inferrule[contract-gamma-out]
+      {C ;Γ,Γ_c,Γ_c,Γ'; d ⊢ p}
+      {C ;Γ,Γ_c,Γ'; d ⊢ p}}
+
+\end{mathpar}    
+    \caption{Types: boring structural stuff }
+    \label{fig:types-structural}
+\end{figure}
+
+
 
 Worth wondering if we're going to be in trouble overloading the $[]$ syntax here; time will tell. 
 Types appear in figure \ref{fig:types}. 
@@ -138,6 +177,10 @@ we've got $C;Γ;d ⊢ p : τ$, $Γ ⊢ d : τ$, and $Γ ⊢ d ⇝ d'$.
 That's a lot more independent systems than we'd ideally  have.  Is there a way to collapse this back down? 
 
 Another important note! I think fold/unfold are wrong and unfit for purpose, actually.  We should really be replacing the variable names with their derivation expression when they're placed into the derivation context for the first time.  But as of right now, that's not how the type system works.  Maybe we need to "output" a derivation, rather than put it in the context.  Note: doing this naively immediately breaks on the dispatch to relevant-parallel and general-parallel.  I think it still holds significant promise, but might not be viable for 11:40pm.
+
+Another note: the "natural" way to do derivations might change between a push-oriented and a pull-oriented worldview---worth thinking about / playing around with.
+
+On the above: turns out I did stay up and push it through and... it seems to work! Shockingly! Quite Interesting. 
 
 \section{general notes}
 
