@@ -62,54 +62,49 @@ In figure \ref{fig:syntax}
 \begin{figure}
   \begin{mathpar}
 
-    {\inferrule{A : in(dₐ), A : out(dₐ),… ;A : τₐ,…  ⊢ p}
+    {\inferrule{A : in(dₐ'.dₐ''), A : out(dₐ.dₐ''),… ⊢ p
+    \\ dₐ' ∈ \{A.dₐ'', dₐ.dₐ''\}
+    \\ (A : τₐ,… ⊢ dₐ.dₐ'' : τₐ)…
+    }
       {⊢ "declare"~A…~"in"~p}}
     
     {
-      \inferrule[pivot]{\inputs(\op) = τ \\ 
-        C;Γ ⊢ p : d~τ \\ C';Γ';d.op[0] ⊢ p'}
-                {{C,C'};Γ,Γ' ⊢ [p]\op[p']}}
+      \inferrule[pivot]{|\outputs(\op)| = |p'| \\ 
+        C ⊢ p : d \\ C';d.op[0] ⊢ p'}
+                {{C,C'} ⊢ [p]\op[p']}}
 
     {
-      \inferrule[inward]{\inputs(\op) = τ \\ 
-        C;Γ ⊢ p : d~τ}
-                {{C};Γ,Γ' ⊢ [p]\op : d.\op~τ'}}
+      \inferrule[inward]{C ⊢ p : d}
+                {{C} ⊢ [p]\op : d.\op[0]}}
 
 {
-      \inferrule[outward]{Γ ⊢ d : τ \\ \inputs(\op) = τ \\
-        C;Γ;d.\op[0] ⊢ p'}
-                {{C};Γ;d ⊢ \op[p']}}
+      \inferrule[outward]{|\outputs(\op)| = |p'| \\
+        C;d.\op[0] ⊢ p'}
+                {{C};d ⊢ \op[p']}}
 
     
     {\inferrule[out-parallel]
-      {C₁;Γ_1;d[n] ⊢ p₁ \\ C₂;Γ_2;d[n+1] ⊢ p₂}
-      {C₁,C₂;Γ_1,Γ_2;d[n] ⊢ (p₁ ∣ p₂)}}
+      {C₁;d[n] ⊢ p₁ \\ C₂;d[n+1] ⊢ p₂}
+      {C₁,C₂;d[n] ⊢ (p₁ ∣ p₂)}}
 
     {\inferrule[in-parallel]
-      {C₁;Γ_1 ⊢ p₁ : d₁~τ₁ \\ C₂;Γ_2 ⊢ p₂ : d₂~τ₂}
-      {C₁,C₂;Γ_1,Γ_2 ⊢ (p₁ ∣ p₂) : (d₁ ∣ d₂)~(τ₁ ∣ τ₂)}}
+      {C₁ ⊢ p₁ : d₁ \\ C₂ ⊢ p₂ : d₂}
+      {C₁,C₂ ⊢ (p₁ ∣ p₂) : (d₁ ∣ d₂)}}
+
+    {\inferrule[varref-out]{}{A:out(d);d ⊢ A}}
+
+    {\inferrule[varref-out-approx]{}{A:out(d'.d);B.d ⊢ A}}\textit{\MPM{Is this sound? Or can it allow the paths to vary too much? I feel like probably the latter....}}
 
 
-%    {\inferrule[unfold]{A:d',C;Γ;d[A/d] ⊢ p : τ}{A:d',C;Γ;d ⊢ p : τ}}
+    {\inferrule[varref-in]{}{A:in(d) ⊢ A : d}}
 
-%    {\inferrule[fold]{A:d',C;Γ;d⊢ p : τ}{A:d',C;Γ;d[A/d]⊢ p : τ}}
-
-    {\inferrule[varref-out]{Γ ⊢ d : τ}{A:out(d);Γ;d ⊢ A}}
-
-    {\inferrule[varref-in]{}{A:in(d);A : τ ⊢ A : d~τ}}
-
-    {\inferrule[axoim-transform-in]{Γ ⊢ d ⇝ d' \\ C;Γ ⊢ p : d~τ}{C;Γ ⊢ p : d'~τ}}
-
-    {\inferrule[axoim-transform-out]{Γ ⊢ d ⇝ d' \\ C;Γ;d' ⊢ p}{C;Γ;d ⊢ p}}
-
-      
-    \end{mathpar}\MPM{There's something fishy going on with varref-in; right now, you could use it and then immediately apply unfold to get a derivation which might not typecheck. We need to prove this is not actually a problem.}
-    %\includegraphics{freehand-types}
+    \end{mathpar}
   \label{fig:types}
   \caption{Types: top-level}
 \end{figure}
 \begin{figure}
 \begin{mathpar}
+    {\inferrule[axoim-transform]{Γ ⊢ d ⇝ d' \\ Γ ⊢ d' : τ}{Γ ⊢ d : τ}}
 
     {\inferrule[derivation-type-base]{}{Γ ⊢ d : τ}}
 
@@ -132,36 +127,24 @@ In figure \ref{fig:syntax}
 \begin{mathpar}
 
     {\inferrule[exchange-C-in]
-      {C,C_2,C_1,C' ;Γ ⊢ p : d~τ}
-      {C,C_1,C_2,C' ;Γ ⊢ p : d~τ}}
-
-    {\inferrule[exchange-gamma-in]
-      {C ;Γ,Γ_1,Γ_2,Γ' ⊢ p : d~τ}
-      {C ;Γ,Γ_2,Γ_1,Γ' ⊢ p : d~τ}}
-
-    {\inferrule[weaken-gamma-in]
-      {C ;Γ,Γ'  ⊢ p : d~τ}
-      {C ;Γ,Γ_w,Γ' ⊢ p : d~τ}}
-
-    {\inferrule[contract-gamma-in]
-      {C ;Γ,Γ_c,Γ_c,Γ' ⊢ p : d~τ}
-      {C ;Γ,Γ_c,Γ' ⊢ p : d~τ}}
+      {C,C_2,C_1,C' ;Γ ⊢ p : d}
+      {C,C_1,C_2,C' ;Γ ⊢ p : d}}
 
     {\inferrule[exchange-C-out]
       {C,C_2,C_1,C' ;Γ; d ⊢ p}
       {C,C_1,C_2,C' ;Γ; d ⊢ p}}
 
-    {\inferrule[exchange-gamma-out]
-      {C ;Γ,Γ_1,Γ_2,Γ'; d ⊢ p}
-      {C ;Γ,Γ_2,Γ_1,Γ'; d ⊢ p}}
+    {\inferrule[exchange-gamma]
+      {Γ,Γ_1,Γ_2,Γ' ⊢ φ}
+      {Γ,Γ_2,Γ_1,Γ' ⊢ φ}}
 
-    {\inferrule[weaken-gamma-out]
-      {C ;Γ,Γ'; d  ⊢ p}
-      {C ;Γ,Γ_w,Γ'; d ⊢ p}}
+    {\inferrule[weaken-gamma]
+      {Γ,Γ'  ⊢ φ}
+      {Γ,Γ_w,Γ' ⊢ φ}}
 
-    {\inferrule[contract-gamma-out]
-      {C ;Γ,Γ_c,Γ_c,Γ'; d ⊢ p}
-      {C ;Γ,Γ_c,Γ'; d ⊢ p}}
+    {\inferrule[contract-gamma]
+      {Γ,Γ_c,Γ_c,Γ' ⊢ φ}
+      {Γ,Γ_c,Γ' ⊢ φ}}
 
 \end{mathpar}    
     \caption{Types: boring structural stuff }
