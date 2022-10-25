@@ -156,14 +156,9 @@ In figure \ref{fig:syntax}
 Worth wondering if we're going to be in trouble overloading the $[]$ syntax here; time will tell. 
 Types appear in figure \ref{fig:types}. 
 Another concern is that we have a uhhh _lot_ of type systems in the mix at this point: 
-we've got $C;Γ;d ⊢ p : τ$, $Γ ⊢ d : τ$, and $Γ ⊢ d ⇝ d'$.  
+we've got $C;d ⊢ p$, $C ⊢ p : d$, $Γ ⊢ d : τ$, and $Γ ⊢ d ⇝ d'$.  
 That's a lot more independent systems than we'd ideally  have.  Is there a way to collapse this back down? 
 
-Another important note! I think fold/unfold are wrong and unfit for purpose, actually.  We should really be replacing the variable names with their derivation expression when they're placed into the derivation context for the first time.  But as of right now, that's not how the type system works.  Maybe we need to "output" a derivation, rather than put it in the context.  Note: doing this naively immediately breaks on the dispatch to relevant-parallel and general-parallel.  I think it still holds significant promise, but might not be viable for 11:40pm.
-
-Another note: the "natural" way to do derivations might change between a push-oriented and a pull-oriented worldview---worth thinking about / playing around with.
-
-On the above: turns out I did stay up and push it through and... it seems to work! Shockingly! Quite Interesting. 
 
 \section{general notes}
 
