@@ -1,6 +1,6 @@
 
 \documentclass{article}
-\usepackage{utf8math,ttquot,mathpartir,amsmath, amssymb, hydrocomments, mathtools,multicol,xspace}
+\usepackage{utf8math,ttquot,mathpartir,amsmath, amssymb, hydrocomments, mathtools,multicol,xspace,stmaryrd }
 \usepackage[margin=1in]{geometry}
 \begin{document}
 
@@ -40,6 +40,7 @@
 \newcommand{\fresh}{\textit{fresh}\xspace}
 \newcommand{\inputs}{\textit{inputs}\xspace}
 \newcommand{\outputs}{\textit{outputs}\xspace}
+\newcommand{\outarity}{\textit{output-arity}\xspace}
 \newcommand{\IT}[1]{{\textit{#1}}\xspace}
 
 \begin{figure}
@@ -54,7 +55,6 @@
   \caption{Syntax}
 \end{figure}
 
-
 In figure \ref{fig:syntax}
 
 \section{types}
@@ -62,24 +62,24 @@ In figure \ref{fig:syntax}
 \begin{figure}
   \begin{mathpar}
 
-    {\inferrule{A : in(dₐ'.dₐ''), A : out(dₐ.dₐ''),… ⊢ p
-    \\ dₐ' ∈ \{A.dₐ'', dₐ.dₐ''\}
-    \\ (A : τₐ,… ⊢ dₐ.dₐ'' : τₐ)…
+    {\inferrule{A : in(dₐ' ▷ dₐ''), A : out(dₐ ▷ dₐ''),… ⊢ p
+    \\ dₐ' ∈ \{A ▷ dₐ'', dₐ ▷ dₐ''\}
+    \\ (A : τₐ,… ⊢ dₐ ▷ dₐ'' : τₐ)…
     }
       {⊢ "declare"~A…~"in"~p}}
     
     {
       \inferrule[pivot]{|\outputs(\op)| = |p'| \\ 
-        C ⊢ p : d \\ C';d.op[0] ⊢ p'}
+        C ⊢ p : d \\ C';d ▷ op[0] ⊢ p'}
                 {{C,C'} ⊢ [p]\op[p']}}
 
     {
       \inferrule[inward]{C ⊢ p : d}
-                {{C} ⊢ [p]\op : d.\op[0]}}
+                {{C} ⊢ [p]\op : d ▷ \op[0]}}
 
 {
-      \inferrule[outward]{|\outputs(\op)| = |p'| \\
-        C;d.\op[0] ⊢ p'}
+      \inferrule[outward]{\outarity(\op) = |p'| \\
+        C;d ▷ \op[0] ⊢ p'}
                 {{C};d ⊢ \op[p']}}
 
     
@@ -104,14 +104,32 @@ In figure \ref{fig:syntax}
 \end{figure}
 \begin{figure}
 \begin{mathpar}
+    
     {\inferrule[axoim-transform]{Γ ⊢ d ⇝ d' \\ Γ ⊢ d' : τ}{Γ ⊢ d : τ}}
-
-    {\inferrule[derivation-type-base]{}{Γ ⊢ d : τ}}
+    
+    {\inferrule[parallel]
+      {Γ₁ ⊢ p₁ : τ₁ \\ Γ₂ ⊢ p₂ : τ₂}
+      {Γ₁,Γ₂ ⊢ (p₁ ∣ p₂) : (τ₁ ∣ τ₂)}}
+      
+    {\inferrule[operator-typing]{Γ ⊢ d : τ'}{Γ ⊢ d ▷ \op[n] : (〚\op〛 τ')[n]}}
 
 \end{mathpar}    
     \caption{Types: derivations }
     \label{fig:types2}
 \end{figure}
+
+\begin{figure}
+\begin{mathpar}
+
+\inferrule[action-on-type]{}{〚\op〛 τ ≜ τ'}
+
+\inferrule[index-into-type]{}{(τ₁ | … | τ_n | …)[n] ≜ τ_n}
+
+\end{mathpar}
+    \caption{Operators: actions on types }
+    \label{fig:types2}
+\end{figure}
+
 
 \begin{figure}
 \begin{mathpar}
