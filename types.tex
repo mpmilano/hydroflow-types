@@ -62,9 +62,8 @@ In figure \ref{fig:syntax}
 \begin{figure}
   \begin{mathpar}
 
-    {\inferrule{A : in(dₐ' ▷ dₐ''), A : out(dₐ ▷ dₐ''),… ⊢ p
-    \\ dₐ' ∈ \{A ▷ dₐ'', dₐ ▷ dₐ''\}
-    \\ (A : τₐ,… ⊢ dₐ ▷ dₐ'' : τₐ)…
+    {\inferrule{A▷, dₐ▷A,… ⊢ p
+    \\ (dₐ▷A : τₐ,… ⊢ dₐ : τₐ)…
     }
       {⊢ "declare"~A…~"in"~p}}
     
@@ -91,12 +90,12 @@ In figure \ref{fig:syntax}
       {C₁ ⊢ p₁ : d₁ \\ C₂ ⊢ p₂ : d₂}
       {C₁,C₂ ⊢ (p₁ ∣ p₂) : (d₁ ∣ d₂)}}
 
-    {\inferrule[varref-out]{}{A:out(d);d ⊢ A}}
+    {\inferrule[varref-out]{}{ d▷A;d ⊢ A}}
 
-    {\inferrule[varref-out-approx]{}{A:out(d'.d);B.d ⊢ A}}\textit{\MPM{Is this sound? Or can it allow the paths to vary too much? I feel like probably the latter....}}
+%    {\inferrule[varref-out-approx]{}{A:out(d'.d);B.d ⊢ A}}\textit{\MPM{Is this sound? Or can it allow the paths to vary too much? I feel like probably the latter....}}
 
 
-    {\inferrule[varref-in]{}{A:in(d) ⊢ A : d}}
+    {\inferrule[varref-in]{}{A▷ ⊢ A : A}}
 
     \end{mathpar}
   \label{fig:types}
@@ -105,13 +104,17 @@ In figure \ref{fig:syntax}
 \begin{figure}
 \begin{mathpar}
     
-    {\inferrule[axoim-transform]{Γ ⊢ d ⇝ d' \\ Γ ⊢ d' : τ}{Γ ⊢ d : τ}}
+    {\inferrule[assert-matching]{Γ ⊢ d ⇝ d' \\ Γ ⊢ d : τ}{Γ ⊢ d▷as(d')[0] : τ}}
+
     
     {\inferrule[parallel]
       {Γ₁ ⊢ p₁ : τ₁ \\ Γ₂ ⊢ p₂ : τ₂}
       {Γ₁,Γ₂ ⊢ (p₁ ∣ p₂) : (τ₁ ∣ τ₂)}}
       
     {\inferrule[operator-typing]{Γ ⊢ d : τ'}{Γ ⊢ d ▷ \op[n] : (〚\op〛 τ')[n]}}
+
+    {\inferrule[varref]{}{ d▷A : τ ⊢ A : τ}}
+
 
 \end{mathpar}    
     \caption{Types: derivations }
@@ -134,11 +137,22 @@ In figure \ref{fig:syntax}
 \begin{figure}
 \begin{mathpar}
 
-{\inferrule[axoim-transform-base]{}{Γ ⊢ d ⇝ d'}}
+{\inferrule[axoim-transform-abstract]{Γ,dₐ▷A : τₐ ⊢ d ⇝ d' \\ A~\fresh}{Γ ⊢ d[A/dₐ] ⇝ d'}}
+
+{\inferrule[axoim-transform-concretize]{τₐ <: τ}{Γ,dₐ▷A : τₐ ⊢ d ⇝ d["?s"~τ/dₐ]}}
+
+{\inferrule[axoim-transform-transitive]{Γ ⊢ d ⇝ d' \\ Γ ⊢ d' ⇝ d''}{
+Γ ⊢ d ⇝ d''}}
+
+{\inferrule[axoim-transform-unfold]{}{Γ,dₐ▷A : τₐ  ⊢ d ⇝ d[A/dₐ]}}
+
+{\inferrule[axoim-transform-fold]{}{Γ,dₐ▷A : τₐ  ⊢ d[A/dₐ] ⇝ d}}
+
+{\inferrule[axoim-transform-reflexive]{}{Γ ⊢ d ⇝ d}}
 
 \end{mathpar}    
     \caption{Types: axiom transformations }
-    \label{fig:types3}
+    \label{fig:axiom-types}
 \end{figure}
 
 \begin{figure}
@@ -176,6 +190,8 @@ Types appear in figure \ref{fig:types}.
 Another concern is that we have a uhhh _lot_ of type systems in the mix at this point: 
 we've got $C;d ⊢ p$, $C ⊢ p : d$, $Γ ⊢ d : τ$, and $Γ ⊢ d ⇝ d'$.  
 That's a lot more independent systems than we'd ideally  have.  Is there a way to collapse this back down? 
+
+A new concern: we're building out the axiom transformation system in figure \ref{fig:axiom-types}, which relies on these substitution operators. I'm really not sure how to encode the substitutions---or the notion of an environment into which substitutions occur at all---into Rust. I guess they'd be... literal variables? Very unclear.
 
 
 \section{general notes}
