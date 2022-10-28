@@ -137,6 +137,13 @@ In figure \ref{fig:syntax}
 \begin{figure}
 \begin{mathpar}
 
+{\inferrule[axiom-transform-option1]{\forall s. d(s) \subseteq d'(s)}{Γ ⊢ d ⇝ d'}}
+
+{\inferrule[axiom-transform-option2]{d \subseteq d'}{Γ ⊢ d ⇝ d'}}
+
+{\inferrule[axiom-transform-option3]{pre(d) \rightarrow pre(d') 
+ \\ post(d') \rightarrow post(d)}{Γ ⊢ d ⇝ d'}}
+
 {\inferrule[axoim-transform-abstract]{Γ,dₐ▷A : τₐ ⊢ d ⇝ d' \\ A~\fresh}{Γ ⊢ d[A/dₐ] ⇝ d'}}
 
 {\inferrule[axoim-transform-concretize]{τₐ <: τ}{Γ,dₐ▷A : τₐ ⊢ d ⇝ d["?s"~τ/dₐ]}}
