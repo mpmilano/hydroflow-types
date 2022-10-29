@@ -365,14 +365,14 @@ The ``\verb|figure|'' environment should be used for figures. One or
 more images can be placed within a figure. If your figure contains
 third-party material, you must clearly identify it as such, as shown
 in the example below.
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=\linewidth]{sample-franklin}
-  \caption{1907 Franklin Model D roadster. Photograph by Harris \&
-    Ewing, Inc. [Public domain], via Wikimedia
-    Commons. (\url{https://goo.gl/VLCRBB}).}
-  \Description{A woman and a girl in white dresses sit in an open car.}
-\end{figure}
+%\begin{figure}[h]
+%  \centering
+%  \includegraphics[width=\linewidth]{sample-franklin}
+%  \caption{1907 Franklin Model D roadster. Photograph by Harris \&
+%    Ewing, Inc. [Public domain], via Wikimedia
+%    Commons. (\url{https://goo.gl/VLCRBB}).}
+%  \Description{A woman and a girl in white dresses sit in an open car.}
+%\end{figure}
 
 Your figures should contain a caption which describes the figure to
 the reader.
@@ -592,6 +592,10 @@ dui. Etiam sagittis eleifend elementum.
 Nam interdum magna at lectus dignissim, ac dignissim lorem
 rhoncus. Maecenas eu arcu ac neque placerat aliquam. Nunc pulvinar
 massa et mattis lacinia.
+
+\bibliographystyle{ACM-Reference-Format}
+\citestyle{acmauthoryear}
+\bibliography{../thesis,bibtex/pm-master}
 
 \end{document}
 \endinput
