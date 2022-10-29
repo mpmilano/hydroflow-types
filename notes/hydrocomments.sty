@@ -1,1 +1,22 @@
-../hydrocomments.sty
+\NeedsTeXFormat{LaTeX2e}[2.09]
+\ProvidesPackage{hydrocomments}
+
+%% Usage: \usepackage[hydrocomments]
+%%
+%% Options:
+%%
+%%  \usepackage[disabled]{hydrocomments} : turn off all comments
+%%  \usepackage[checkNoComments]{hydrocomments} : make comments appear inline
+%%
+%% If the file .nocomments exists, this will also turn off all comments
+
+
+\DeclareOption*{\PassOptionsToPackage{\CurrentOption}{authcomments}}
+\PassOptionsToPackage{checkNoComments}{authcomments}
+\ProcessOptions
+
+\usepackage{authcomments}
+
+\newcommenter{JMH}{1.0,0.8,0.7}    % salmon
+\newcommenter{MPM}{0.9,0.5,0.0}    % orange
+\newcommenter{REV}{1.0,0,1.0}      % magenta (reviewer comments)
