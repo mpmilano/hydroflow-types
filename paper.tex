@@ -2,7 +2,8 @@
 
 \let\Bbbk\relax
 \usepackage{amssymb}
-\usepackage{utf8math,ttquot,mathpartir,amsmath, hydrocomments, mathtools,multicol,xspace,stmaryrd }
+\usepackage[checkNoComments]{hydrocomments}
+\usepackage{utf8math,ttquot,mathpartir,amsmath, mathtools,multicol,xspace,stmaryrd }
 
 
 \begin{document}
@@ -16,36 +17,39 @@
 %% The abstract is a short summary of tThe work to be presented in the
 %% article.
 \begin{abstract}
-  A clear and well-documented \LaTeX\ document is presented as an
-  article formatted for publication by ACM in a conference proceedings
-  or journal publication. Based on the ``acmart'' document class, this
-  article presents and explains many of the common variations, as well
-  as many of the formatting elements an author may use in the
-  preparation of the documentation of their work.
+
+%In this paper we introduce the HydroFlow programming language, a new 
+
 \end{abstract}
 
-%% A "teaser" image appears between the author and affiliation
-%% information and the body of the document, and typically spans the
-%% page.
-%\begin{teaserfigure}
-%  \includegraphics[width=\textwidth]{sampleteaser}
-%  \caption{Seattle Mariners at Spring Training, 2010.}
-%  \Description{Enjoying the baseball game from the third-base
-%  seats. Ichiro Suzuki preparing to bat.}
-%  \label{fig:teaser}
-%\end{teaserfigure}
-
-%\received{20 February 2007}
-%\received[revised]{12 March 2009}
-%\received[accepted]{5 June 2009}
-
-%%
-%% This command processes the author and affiliation and title
-%% information and builds the first part of the formatted document.
 \maketitle
 
 \section{Introduction}
-ACM's consolidated article template \cite{mixt}, 
+
+\MPM{This is intentionally badly-written. Think of it like an outline that was formatted like a paper.}
+
+Dataflow programming remains a compelling abstraction for cloud-based distributed computation.  In a dataflow program, a series of computational units known as _operators_ are arranged in a graph, with output from one operator ``flowing'' to its successor.  Each operator then processes a stream of inputs, and produces a stream of outputs directed at its next operator in sequence. This model of computation first gained popularity in the distributed systems community via projects like Dryad \cite{dryad} and MapReduce \cite{mapreduce}, but finds its origins within the databases community, primarily as a way of representing and executing SQL queries \cite{sql-dataflow}. Modern incarnations of distributed dataflow programming models, such as Materialize's Differential Dataflow and Apache's Spark and Storm \cite{spark, storm}, suffer from three major limitations: (1) Run-time type failures, (2) frequent barriers or retractions, (3) poor scalability.\MPM{Obviously we need to say more about these here, and not just wait until the background section.} 
+
+
+In this work we present the HydroFlow programming language, a new dataflow language and runtime designed to overcome these three limitations.  
+
+\section{Background: The three major problems of existing streaming frameworks}
+
+It could perhaps make sense to put a more step-by-step overview of distributed streaming systems here, rather than rely on a drive-by explanation in the intro. Especially considering our audience is PL, who have certainly _heard_ of these things but have no real idea how the work or why they are used. 
+
+\subsection{Stream Property Violations}
+
+While the use of static types to eliminate the most common classes of errors is common in some distributed dataflow frameworks, these static types reflect only the power of the underlying type system. While they are able to reason about the type of the individual elements flowing through each stream, they are unable to reason about properties of the _stream itself_, which may be assumed to hold by downstream operators. Thus, each operators must independently enforce any stream properties at run-time, choosing to expose the programmer to crashes---or worse, logic errors.
+
+\subsection{Barriers, Retractions, and State: oh my!}
+
+When streaming computations are paired with state (as is their common case), thorny issues of consistency and determinism can quickly arise.  Consider, for example, an operator that runs a single query φ on the entire stream as a single unit, producing a single boolean result ($φ : stream → bool$). Implementing such operators are challenging; existing systems generally take one of three approaches.  Industry-standard dataflow environments (like Spark and such) take the conservative approach; they wait for a distinguished end-of-stream message\MPM{say something intelligent about batching here or something}, after which they are able to safely run φ on the entire stream.  Other systems, most notable differential dataflow, take a different approach; they will continuously re-evaluate φ on each input, issuing a _retraction_ if the result of φ should ever change.  It is then the responsibility of downstream operators to determine how to use this retraction to adjust their own computational results.  Within the PL space, reactive programming frameworks have solved this problem in a number of ways; most commonly, upon the arrival of an updated value, they re-evaluate all functions which depended on that value, using a memoization strategy to avoid performing truly redundant computation.
+
+All of these solutions have significant drawbacks.  In distributed dataflow, a batching approach significantly complicates the problem of distributed scheduling; downstream operators must sit idle while whole-stream queries wait for their inputs to finish arriving, and so great effort must be spent to ensure that any nodes which power downstream operators are put to good use in the interim. Regardless of whether the scheduling problem can be solved satisfactorily, there is the issue of latency; blocking until the end of input threatens liveness, and can delay computation results indefinitely. 
+
+Meanwhile, both retractions and re-executions feature significant wasted computation.  In the best case, retractions must effectively produce _new_ computation to undo the effects of old, resulting in many CPU-hours wasted; in the worst case, retractions arrive too late, opening the application up to consistency issues.  Re-executions, meanwhile, are unable to determine ahead of time if the re-execution will meaningfully alter the value ultimately computed by the reactive program, stopping only when a cached value has been dynamically detected.  This can lead to significant wasted re-computation; for example, when computing if the cardinality of a set is above a certain threshold, these computations would continuously re-compute the set cardinality, only to determine that it has no effect on the threshold and thus no effect on the overall computation. 
+
+\subsection{Scaling manually, if at all}
 
 \bibliographystyle{ACM-Reference-Format}
 \citestyle{acmauthoryear}
