@@ -67,18 +67,88 @@ Bringing these benefits to the general domain of distributed dataflow programmin
 \section{An overview of the HydroFlow language}
 \label{sec:hydroflow-overview}
 
-Our basic goals for this section are to say: 
+\subsection{Hydroflow as a dataflow library}
 
-\begin{itemize}
-\item Hydroflow is a streaming programming language that transfers lattice elements
-\item HydroFlow assembles operators (as Rust functions) into a dataflow graph using a surface syntax
-\item HydroFlow makes independently-scheduled units, which we call _compiled components_, explicit; the surface syntax figures this out for you though.
-\item Some amount of properties?  
-\end{itemize}
+At its most basic, hydroflow functions as a traditional dataflow
+library; it applies a sequence of operators to some stream,
+transforming a stream of inputs into a stream of outputs. As with
+modern stream-oriented libraries, Hydroflow's notion of streams is
+highly flexible; operators, which may be built-in or user-supplied,
+are able to consume and produce any number of streams (as inputs and
+outputs respectively), and may maintain internal state.
 
-We now review the syntax and basic user-facing features of HydroFlow, including its programming model, extensible operators, and the user-facing portions of its type system.
+\subsubsection{Defining Hydroflow operators}
 
-HydroFlow is a stream-oriented programming language, deeply embedded within Rust.  A HydroFlow program consists of a sequence of _operator_ definitions, followed by a description of a _dataflow graph_ which assemble instances of these operators into a dataflow computation. 
+Operationally, HydroFlow operators are defined as ordinary Rust
+functions which take any number of arguments, each of which
+corresponds to a single element from the operator's input stream(s).
+
+...I actually don't remember the details of this part, time to read the hydroflow book.
+
+Our basic goals for this section are to say:
+
+\subsubsection{Assembling a Hydroflow Graph}
+
+With operators in hand, users may now assemble a hydroflow graph.  To
+do this, we have supplied a convenient high-level graph assembly
+syntax reminiscent of XXX, whose formal definition can be found in
+figure \ref{fig:hydroflow-pipeline-syntax}. With this syntax, users
+explicitly create instances of previously-defined operators, and
+``wire'' them together via the "->" notation.  For operators with
+multiple input or output streams, users can index operators via the
+"[n]op" (for inputs) or "op[n]" (for outputs) syntax.  Our
+graph-assembly compiler ensures that all inputs and outputs to
+operators are successfully connected, and that no output (or input) is
+used twice.
+
+\subsubsection{Running a hydroflow program}
+
+I'm not sure there's a ton to say about this, but here's a stub.
+
+\subsection{Hydroflow as a stream-oriented programming language}
+
+When viewed as a language, Hydroflow's power and promise above
+traditional dataflow libraries reveals itself. Most interesting are
+two key points: hydroflow programs as transformers for streams of
+lattice points, and Hydroflow's ability to reason about _properties_
+of these streams.
+
+\subsubsection{Streams of lattice points}
+
+In Hydroflow, a _lattice_\footnote{as in lattice order, from order
+theory} is a special class of datastructure equipped with a partial
+order ⊑ and _join_q (written ⊔) and _meet_ (written ⊓) functions.
+Both join and meet must be associative, commutative, and idempotent;
+additionally, join must inflate elements along ⊑, while meet must
+deflate them. That is: $∀ a,b: a ⊑ a ⊔ b ∧ b ⊑ a ⊔ b$ (for join) and
+$∀ a,b: a ⊓ b ⊑ a ∧ a ⊓ b ⊑ b$ (for meet).  Rather than operate on
+streams of arbitrary data types, hydroflow programs operate on streams
+of _Lattice Points_, or elements of lattices, drawn from any number of
+user-defined Lattices.
+
+Our choice to use lattices (and lattice points) provides key
+information to the hydroflow compiler when determining optimizations;
+which, of course, it does not take advantage of in any way whatsoever,
+so I guess this section needs to tie into the story about informing a
+higher-level analysis about lattice stuff.
+
+While our choice to use lattices alone might seem more restrictive
+than traditional dataflow engines, the reality is in fact the
+opposite; one can always build a lattice from an arbitrary datatype.
+Rather, our choice to privilege streams of lattice points provides the
+opportunity to the programmer to communicate certain datastructure
+features to the hydroflow compiler; should those features be absent,
+one can always take the free lattice over a given datatype. This is
+achieved by declaring all elements of that datatype to be unordered by
+⊑, and introducing an arbitrary ⊤ and ⊥ elements to serve as the
+supremum and infinimum of the lattice respectively.  One can then
+define $a ⊔ b ≜ (a == b ? a : ⊤)$ and $a ⊓ b ≜ (a == b ? a : ⊥)$,
+satisfying the requirements for both ⊔ and ⊓ operators.
+
+\subsubsection{Properties of streams}
+
+
+
 
 \bibliographystyle{ACM-Reference-Format}
 \citestyle{acmauthoryear}
