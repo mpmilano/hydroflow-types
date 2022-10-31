@@ -64,6 +64,22 @@ SQL optimizers, meanwhile, have long relied on the ability to rewrite dataflow g
 
 Bringing these benefits to the general domain of distributed dataflow programming poses a challenge: SQL optimizers assume complete knowledge of program text, and allow only a small set of operators.  Crucially, there are no abstractions in these programs beyond tables and no extensibility or modularity beyond ``user-defined functions (UDFs),'' which must be treated conservatively by the optimizer and which allow only a restrictive class of additional computations.  In contrast, the world of distributed dataflow programming frequently features custom operators, and increasingly relies on abstractions in the form of both libraries and modular program design \cite{hope-this-is-true!}. Thus, modern dataflow libraries largely make no attempt to perform rewriting optimizations; those which do perform rewriting optimizations simply defer to SQL as an input language, allowing traditional query optimization assumptions to hold. 
 
+\section{An overview of the HydroFlow language}
+\label{sec:hydroflow-overview}
+
+Our basic goals for this section are to say: 
+
+\begin{itemize}
+\item Hydroflow is a streaming programming language that transfers lattice elements
+\item HydroFlow assembles operators (as Rust functions) into a dataflow graph using a surface syntax
+\item HydroFlow makes independently-scheduled units, which we call _compiled components_, explicit; the surface syntax figures this out for you though.
+\item Some amount of properties?  
+\end{itemize}
+
+We now review the syntax and basic user-facing features of HydroFlow, including its programming model, extensible operators, and the user-facing portions of its type system.
+
+HydroFlow is a stream-oriented programming language, deeply embedded within Rust.  A HydroFlow program consists of a sequence of _operator_ definitions, followed by a description of a _dataflow graph_ which assemble instances of these operators into a dataflow computation. 
+
 \bibliographystyle{ACM-Reference-Format}
 \citestyle{acmauthoryear}
 \bibliography{thesis,pm-master}
