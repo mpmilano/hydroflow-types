@@ -70,16 +70,16 @@ In figure \ref{fig:syntax}
     {
       \inferrule[pivot]{|\outputs(\op)| = |p'| \\ 
         C ⊢ p : d \\ C';d ▷ op[0] ⊢ p'}
-                {{C,C'} ⊢ [p]\op[p']}}
+                {{C,C'} ⊢ (p)\op(p')}}
 
     {
       \inferrule[inward]{C ⊢ p : d}
-                {{C} ⊢ [p]\op : d ▷ \op[0]}}
+                {{C} ⊢ (p)\op : d ▷ \op[0]}}
 
 {
       \inferrule[outward]{\outarity(\op) = |p'| \\
         C;d ▷ \op[0] ⊢ p'}
-                {{C};d ⊢ \op[p']}}
+                {{C};d ⊢ \op(p')}}
 
     
     {\inferrule[out-parallel]
@@ -144,20 +144,13 @@ In figure \ref{fig:syntax}
 %{\inferrule[axiom-transform-option3]{pre(d) \rightarrow pre(d') 
 % \\ post(d') \rightarrow post(d)}{Γ ⊢ d ⇝ d'}}
 
-     {\inferrule[axoim-transform-abstract]{Γ,dₐ▷A : τₐ ⊢ d ⇝ d' \\ A~\fresh}{Γ ⊢ d[A/dₐ] ⇝ d'}}
+     {\inferrule[axiom-transform-abstract]{Γ,dₐ▷A : τₐ ⊢ d ⇝ d' \\ A~\fresh}{Γ ⊢ d[A/dₐ] ⇝ d'}}
 
-     {\inferrule[axoim-transform-erase]{Γ ⊢ d[A/"?s"~τ] ⇝ d'[A/"?s"~τ] \\ s~\fresh}{Γ,dₐ▷A : τₐ ⊢ d ⇝ d'}}
+{\inferrule[axiom-transform-concretize]{τₐ <: τ \\ Γ ⊢ dₐ : τₐ}{Γ ⊢ d ⇝ d["?s"~τ/dₐ]}}
 
-{\inferrule[axoim-transform-concretize]{τₐ <: τ}{Γ,dₐ▷A : τₐ ⊢ d ⇝ d["?s"~τ/dₐ]}}
+{\inferrule[axiom-transform-unfold]{}{Γ,dₐ▷A : τₐ  ⊢ d ⇝ d[A/dₐ]}}\MPM{ideally we'd find a way to do this one item at a time, not all-at-once like this. Also, to both sides of the ⇝.}
 
-{\inferrule[axoim-transform-transitive]{Γ ⊢ d ⇝ d' \\ Γ ⊢ d' ⇝ d''}{
-Γ ⊢ d ⇝ d''}}
-
-{\inferrule[axoim-transform-unfold]{}{Γ,dₐ▷A : τₐ  ⊢ d ⇝ d[A/dₐ]}}
-
-{\inferrule[axoim-transform-fold]{}{Γ,dₐ▷A : τₐ  ⊢ d[A/dₐ] ⇝ d}}
-
-{\inferrule[axoim-transform-reflexive]{}{Γ ⊢ d ⇝ d}}
+{\inferrule[axiom-transform-fold]{}{Γ,dₐ▷A : τₐ  ⊢ d[A/dₐ] ⇝ d}}\MPM{Same comment here.}
 
 \end{mathpar}    
     \caption{Types: axiom transformations }
@@ -194,7 +187,6 @@ In figure \ref{fig:syntax}
 
 
 
-Worth wondering if we're going to be in trouble overloading the $[]$ syntax here; time will tell. 
 Types appear in figure \ref{fig:types}. 
 Another concern is that we have a uhhh _lot_ of type systems in the mix at this point: 
 we've got $C;d ⊢ p$, $C ⊢ p : d$, $Γ ⊢ d : τ$, and $Γ ⊢ d ⇝ d'$.  
